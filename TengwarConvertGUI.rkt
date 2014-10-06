@@ -5,13 +5,12 @@
 ;OUTLINE
 ;----------------------------------------------------
 ; GUI gets input from user
-; GUI creates Output.txt
-; GUI calls TengwarConvert.java and passes input
+; GUI creates Output.txt with input
+; GUI calls TengwarConvert.java and passes Output.txt
 ; TengwarConvert.java runs conversion
-; GUI gets output from TengwarConvert.java
-; GUI saves output to Output.txt
+; TengwarConvert prints output to Output_converted.txt
 ; GUI calls OpenOutput.vbs
-; OpenOutput.vbs opens Output.txt in notepad
+; OpenOutput.vbs opens Output_converted.txt in notepad
 ; OpenOutput.vbs changes font to Tengwar Annatar
 
 (require racket/gui)
@@ -41,6 +40,21 @@
                 (stretchable-height #f)
                 ))
 
+;INPUT
+(define input "in aenchent tiems the rings of power wer crafted bie the elven-smiths, and sawron, the dark lord, forjed the wun ring, filling it with hiz oewn power so that he culd rul all others!")
+
+(print-this input "Output.txt")
+
+(define output
+  (with-output-to-string (lambda ()
+                           (system "java TengwarConvert Output.txt"))))
+
+(system "cscript OpenOutput.vbs")
+
+(delete-file "Output_converted.txt")
+(delete-file "Output.txt")
+
+
 
 (send main-frame create-status-line)
-(send main-frame show #t)
+;(send main-frame show #t)
