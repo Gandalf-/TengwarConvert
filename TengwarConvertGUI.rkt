@@ -54,7 +54,5 @@
 (delete-file "Output_converted.txt")
 (delete-file "Output.txt")
 
-
-
 (send main-frame create-status-line)
 ;(send main-frame show #t)
