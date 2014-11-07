@@ -27,6 +27,24 @@
                           (lambda (output-port)
                             (display x output-port))))
 
+;INPUT/CONVERSION
+;------------------------------------------------------------------------------
+(define example "in aenchent tiems the rings of power wer crafted bie the elven-smiths")
+
+(define (run-convert input)
+  ;Print to file
+  (print-this (string-append " " input) "Output.txt")
+  ;Get conversion
+  (define output
+    (with-output-to-string (lambda ()
+                             (system "java TengwarConvert Output.txt"))))
+  ;Open converted text in notepad
+  (system "cscript OpenOutput.vbs")
+  ;Cleanup
+  (delete-file "Output_converted.txt")
+  (delete-file "Output.txt")
+  )
+
 ;MAIN-WINDOW
 ;---------------------------------------------
 (define main-frame 
@@ -34,25 +52,55 @@
        (label "TengwarConvert")
        (stretchable-width #f)
        (stretchable-height #f)
+       (min-width 400)
+       (min-height 100)
        ))
+
+(define input-panel (instantiate horizontal-panel% (main-frame)
+                      (stretchable-height #f)
+                      ))
 
 (define panel (instantiate horizontal-panel% (main-frame)
                 (stretchable-height #f)
                 ))
 
-;INPUT
-(define input "in aenchent tiems the rings of power wer crafted bie the elven-smiths, and sawron, the dark lord, forjed the wun ring, filling it with hiz oewn power so that he culd rul all others!")
+(define quit-panel (instantiate horizontal-panel% (main-frame)
+                (stretchable-height #f)
+                ))
 
-(print-this input "Output.txt")
+;GUI
+(define input-field
+  (new text-field%
+       (label ">")
+       (parent input-panel)
+       ))
 
-(define output
-  (with-output-to-string (lambda ()
-                           (system "java TengwarConvert Output.txt"))))
+(define clear-button
+  (new button%
+       (label "Clear input")
+       (parent panel)
+       (horiz-margin 12)
+       (callback
+        (lambda (button event)
+          (send input-field set-value " ")
+          (send main-frame set-status-text "Ready")))
+       ))
 
-(system "cscript OpenOutput.vbs")
+(define convert-button
+  (new button%
+       (label "Convert")
+       (parent panel)
+       (horiz-margin 0)
+       (callback
+        (lambda (button event)
+          (send main-frame set-status-text "Working..")
+          (run-convert (send input-field get-value))
+          (send main-frame set-status-text "Done!")
+          (sleep 2)
+          (send main-frame set-status-text "Ready")))
+       ))
 
-(delete-file "Output_converted.txt")
-(delete-file "Output.txt")
-
+(send input-field set-value " ")
 (send main-frame create-status-line)
-;(send main-frame show #t)
+(send main-frame set-status-text "Ready")
+(send main-frame show #t)
