@@ -38,15 +38,17 @@
   (define output
     (with-output-to-string (lambda ()
                              (system "java TengwarConvert Output.txt"))))
-  ;Open converted text in notepad
+  ;Open converted text in notepad with Tengwar Annatar font
   (system "cscript OpenOutput.vbs")
   ;Cleanup
   (delete-file "Output_converted.txt")
   (delete-file "Output.txt")
   )
 
-;MAIN-WINDOW
+;GUI
 ;---------------------------------------------
+
+;Frames and Panels
 (define main-frame 
   (new frame%
        (label "TengwarConvert")
@@ -68,7 +70,7 @@
                 (stretchable-height #f)
                 ))
 
-;GUI
+;Elements
 (define input-field
   (new text-field%
        (label ">")
