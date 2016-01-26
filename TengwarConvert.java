@@ -19,9 +19,9 @@ import java.io.*;
 import java.util.*;
 
 public class TengwarConvert {
-  public static char[] charArray;
-  public static LinkedList<Letter> letterList = new LinkedList<Letter>();
   public static LinkedList<Character> soundList = new LinkedList<Character>();
+  public static LinkedList<Letter> letterList = new LinkedList<Letter>();
+  public static char[] charArray;
 
   //Main
   // Determine which method of input is being given and call the corresponding method
