@@ -24,6 +24,7 @@ public class TengwarConvert {
   public static char[] charArray;
 
   //Main
+  //=================================
   // Determine which method of input is being given and call the corresponding method
   public static void main (String[] args) {
     if (args.length == 1) fileInput(args);
@@ -31,6 +32,7 @@ public class TengwarConvert {
   }
 
   // fileInput
+  //=================================
   // Output is printed to a new file
   public static void fileInput (String[] args) {
     try {
@@ -94,6 +96,7 @@ public class TengwarConvert {
   }
 
   //consoleInput
+  //=================================
   // Output is printed to the console
   public static void consoleInput () {
     System.out.println("Ready");   
@@ -137,9 +140,11 @@ public class TengwarConvert {
 
 
   //simplify
+  //=================================
   // Searches through the array of characters from input and converts them into
-  // simplified form: long vowels (ae, ee, ie, oe, ue) are capitalized and double letters are 
-  // capitalized based on their first letter (th, sh, ch, wh, ld, ng)
+  // simplified form: long vowels (ae, ee, ie, oe, ue) are capitalized and 
+  // double letters are capitalized based on their first letter (th, sh, ch, wh, ld, ng)
+  //
   // Special words have the following translations (of : J, the : G, and : K)
   public static void simplify() {
 
@@ -180,7 +185,8 @@ public class TengwarConvert {
       char cur = letterList.get(i).getChar();
       char nex = letterList.get(i+1).getChar();
 
-      //Repeated consonet case. These add short or long bars indicating a repeated consonet sound
+      //Repeated consonet case. These add short or long bars indicating a 
+      //repeated consonet sound
       if (  cur == nex ) {
         //short width consonet, for single width consonents. Set second repeated consonet Q
         if (cur == 'c' || cur == 'f' || cur == 'h' ||
@@ -247,6 +253,7 @@ public class TengwarConvert {
 
 
   //sortVowels
+  //=================================
   //Searches through the array of characters and moves vowels one character to the right
   public static void sortVowels() {
 
