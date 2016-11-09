@@ -1,19 +1,19 @@
 /*
-Converts Roman letters to Tengwar in English mode. Result is returned 
-in the format used by the Tengwar Annatar font
+  Converts Roman letters to Tengwar in English mode. Result is returned 
+  in the format used by the Tengwar Annatar font
 
-Two input methods:
-1) Input file from command line arguements: the file is read in, 
-   converted and then printed out to a new file
-2) Input is from console
+  Two input methods:
+  1) Input file from command line arguements: the file is read in, 
+     converted and then printed out to a new file
+  2) Input is from console
 
-Testing: 
-in aenchent tiems the rings of power wer crafted bie the elven-smiths, 
-and sawron, the dark lord, forjed the wun ring, filling it with hiz 
-oewn power so that he culd rul all others!
+  Testing: 
+  in aenchent tiems the rings of power wer crafted bie the elven-smiths, 
+  and sawron, the dark lord, forjed the wun ring, filling it with hiz 
+  oewn power so that he culd rul all others!
 */
 
-//Requires Letter.java 
+/* Requires Letter.java */
 import java.util.Scanner;
 import java.io.*;
 import java.util.*;
@@ -23,85 +23,96 @@ public class TengwarConvert {
   public static LinkedList<Letter> letterList = new LinkedList<Letter>();
   public static char[] charArray;
 
-  //Main
-  //=================================
-  // Determine which method of input is being given and call the corresponding method
-  public static void main (String[] args) {
-    if (args.length == 1) fileInput(args);
-    else consoleInput();
-  }
+  public static void main (String[] args) { 
+    /* Determine which method of input is being given and call the
+     * corresponding method
+     */
 
-  // fileInput
-  //=================================
-  // Output is printed to a new file
-  public static void fileInput (String[] args) {
     try {
-      //Setup file input and output file
-      // Assumes that the file has a 3 letter extension (eg. .txt)
-      String inputFileName = args[0];
-      File inputFile = new File(inputFileName);
-      Scanner in = new Scanner(inputFile);
-      PrintWriter writer = new PrintWriter(
-          inputFileName.substring(0, args[0].length() -4) + "_converted.txt");
-
-      System.out.println("Converting...");
-
-      //Get input from file
-      while (in.hasNext() ) {
-        String input = in.nextLine();
-
-        if (input.length() != 0) {
-          // Break the input into space delimited array of words
-          String[] wordsArray = input.split(" ");
-          String outputString = "";
-
-          for (String word : wordsArray) {
-            if (word.length() != 0) {      
-
-              //Make all letters in the array lowercase and run conversions
-              charArray = new char[word.length()];
-
-              for (int i = 0; i < word.length(); i++) 
-                charArray[i] = Character.toLowerCase(word.charAt(i) );
-
-              simplify();       //charArray to letterList
-              sortVowels();     //letterList to letterList
-              findSounds();     //letterList to soundList
-
-              //Build the converted word, add it and a space to the outputString,
-              // and reset the lists
-              String newWord = "";
-              for (int i = 0; i < soundList.size(); i++) 
-                newWord += Character.toString( soundList.get(i) );
-
-              outputString+= newWord;
-              outputString+= " ";
-
-              letterList.clear();
-              soundList.clear();
-            }
-          }
-
-          //Print the finished outputString to the output file
-          writer.println(outputString);
-        }
-      }
-
-      writer.close();
+      if (args.length == 1)
+        fileInput(args); 
+      else 
+        consoleInput(); 
     } 
     catch (FileNotFoundException e) {
       System.out.println("File not found");
-      System.exit(1);
     }
   }
 
-  //consoleInput
-  //=================================
-  // Output is printed to the console
+  public static void fileInput (String[] args) throws FileNotFoundException {
+    /* Output is printed to a new file
+     * Setup file input and output file Assumes that the file has a 3 letter
+     * extension (eg. .txt)
+     */
+
+    String outputFileName, input, outputString, newWord;
+    String[] wordsArray;
+    File inputFile;
+    Scanner in;
+    PrintWriter writer;
+    int i;
+
+    outputFileName = 
+      args[0].substring( 0, args[0].length() -4) + "_converted.txt";
+    inputFile = new File(args[0]);
+    in = new Scanner(args[0]);
+    writer = new PrintWriter(outputFileName);
+
+    System.out.println("Converting...");
+
+    //Get input from file
+    while (in.hasNext() ) {
+      input = in.nextLine();
+
+      if (input.length() != 0) {
+        // Break the input into space delimited array of words
+        wordsArray = input.split(" ");
+        outputString = "";
+
+        for (String word : wordsArray) {
+          if (word.length() != 0) {      
+
+            //Make all letters in the array lowercase and run conversions
+            charArray = new char[word.length()];
+
+            for (i = 0; i < word.length(); i++) 
+              charArray[i] = Character.toLowerCase(word.charAt(i) );
+
+            simplify();       //charArray to letterList
+            sortVowels();     //letterList to letterList
+            findSounds();     //letterList to soundList
+
+            //Build the converted word, add it and a space to the outputString,
+            // and reset the lists
+            newWord = "";
+            for (i = 0; i < soundList.size(); i++) 
+              newWord += Character.toString( soundList.get(i) );
+
+            outputString += newWord;
+            outputString += " ";
+
+            letterList.clear();
+            soundList.clear();
+          }
+        }
+
+        //Print the finished outputString to the output file
+        writer.println(outputString);
+      }
+    }
+
+    writer.close();
+  }
+
+  /* Output is printed to the console */
   public static void consoleInput () {
+
+    Scanner console;
+    String input;
+
     System.out.println("Ready");   
-    Scanner console = new Scanner(System.in);
-    String input = console.nextLine();
+    console = new Scanner(System.in);
+    input = console.nextLine();
     System.out.println("Converting...");
 
     //Move each word seperated by a space into an array of strings, wordsArray
@@ -139,14 +150,15 @@ public class TengwarConvert {
   }
 
 
-  //simplify
-  //=================================
-  // Searches through the array of characters from input and converts them into
-  // simplified form: long vowels (ae, ee, ie, oe, ue) are capitalized and 
-  // double letters are capitalized based on their first letter (th, sh, ch, wh, ld, ng)
-  //
-  // Special words have the following translations (of : J, the : G, and : K)
+  /* Searches through the array of characters from input and converts them into
+     simplified form: long vowels (ae, ee, ie, oe, ue) are capitalized and
+     double letters are capitalized based on their first letter (th, sh, ch,
+     wh, ld, ng)
+
+     Special words have the following translations (of : J, the : G, and : K) */
   public static void simplify() {
+
+    char cur, nex, fol;
 
     //Fill letterList with all the characters
     for (char c : charArray)
@@ -154,8 +166,8 @@ public class TengwarConvert {
 
     //Go through the new letterList and check for words (of, the, and)
     if (letterList.size() == 2) {
-      char cur = letterList.get(0).getChar();
-      char nex = letterList.get(1).getChar();
+      cur = letterList.get(0).getChar();
+      nex = letterList.get(1).getChar();
 
       //of
       if (cur == 'o' && nex == 'f') {
@@ -164,9 +176,9 @@ public class TengwarConvert {
       }   
     }
     if (letterList.size() == 3) {
-      char cur = letterList.get(0).getChar();
-      char nex = letterList.get(1).getChar();
-      char fol = letterList.get(2).getChar();
+      cur = letterList.get(0).getChar();
+      nex = letterList.get(1).getChar();
+      fol = letterList.get(2).getChar();
 
       //the
       if (cur == 't' && nex == 'h' && fol == 'e') {
@@ -182,27 +194,30 @@ public class TengwarConvert {
 
     //Make changes      
     for (int i = 0; i < letterList.size()-1; i++) {
-      char cur = letterList.get(i).getChar();
-      char nex = letterList.get(i+1).getChar();
+      cur = letterList.get(i).getChar();
+      nex = letterList.get(i+1).getChar();
 
-      //Repeated consonet case. These add short or long bars indicating a 
+      //Repeated consonet case. These add short or long bars indicating a
       //repeated consonet sound
       if (  cur == nex ) {
-        //short width consonet, for single width consonents. Set second repeated consonet Q
+        //short width consonet, for single width consonents. Set second
+        //repeated consonet Q
+        //if ("cfhkprstwl".contains("" + cur)) {
         if (cur == 'c' || cur == 'f' || cur == 'h' ||
             cur == 'k' || cur == 'p' || cur == 'r' || 
             cur == 's' || cur == 't' || cur == 'w' || 
             cur == 'l' ) {
 
           letterList.set(i+1, new Letter('Q'));
-        }
-        //long width consonet, for double width consonets. Set second repeated consonet R
+            }
+        //long width consonet, for double width consonets. Set second repeated
+        //consonet R
         if (cur == 'b' || cur == 'd' || cur == 'g' || 
             cur == 'j' || cur == 'm' || cur == 'n' || 
             cur == 'v' ) {
 
           letterList.set(i+1, new Letter('R'));
-        }
+            }
       }
 
       //special double letter case  ( sh, ch, wh, ld), remove following letter 
@@ -213,7 +228,7 @@ public class TengwarConvert {
 
         letterList.set(i, new Letter(Character.toUpperCase(cur)) );
         letterList.remove(i+1);
-      }
+          }
 
       //th case. Change t to H, remove h
       else if (  cur == 't' && nex == 'h') {
@@ -227,7 +242,7 @@ public class TengwarConvert {
 
         letterList.set(i, new Letter(Character.toUpperCase(nex)) );
         letterList.remove(i+1);  
-      }   
+          }   
 
       //long vowel case. Any vowel followed by an e. Uppercase vowel, remove following e
       else if ( (cur == 'a' || cur == 'e' || cur == 'i' || cur == 'o' || cur == 'u')
@@ -235,28 +250,26 @@ public class TengwarConvert {
 
         letterList.set(i, new Letter(Character.toUpperCase(cur)) );
         letterList.remove(i+1);
-      }
+          }
     }
 
     //s followed by a vowel case, change to downward pointing S
     for (int i = 0; i < letterList.size()-1; i++) {
-      char cur = letterList.get(i).getChar();
-      char nex = letterList.get(i+1).getChar();
+      cur = letterList.get(i).getChar();
+      nex = letterList.get(i+1).getChar();
 
       if ( cur == 's' && (nex == 'a' || nex == 'e' || 
             nex == 'i' || nex == 'o' || nex == 'u') ) {
 
         letterList.set(i, new Letter((char)27) );
-      }  
+            }  
     }
   }
 
 
-  //sortVowels
-  //=================================
-  //Searches through the array of characters and moves vowels one character to the right
+  /* Searches through the array of characters and moves vowels 
+     one character to the right*/
   public static void sortVowels() {
-
     //Last sound is s case and preceeding character is not a vowel
     //Replace last s with special s character
     if ( letterList.size() > 2  && 
@@ -273,7 +286,7 @@ public class TengwarConvert {
 
       if (foundVowel == false ) 
         letterList.set(letterList.size()-1, new Letter('X') );
-    }
+        }
 
     for (int i = 0; i < letterList.size()-1; i++) {
       char cur = letterList.get(i).getChar();
@@ -289,7 +302,7 @@ public class TengwarConvert {
         letterList.set(i, nexL);
         letterList.set(i+1, curL);
         curL.moved();
-      }
+          }
       ///Move long vowel case. Swap nexL and curL in letterList
       if ( (cur == 'A' || cur == 'E' || cur == 'I' || cur == 'O' || cur == 'U') 
           && (curL.getState() == false) ) {
@@ -297,16 +310,13 @@ public class TengwarConvert {
         letterList.set(i, nexL);
         letterList.set(i+1, curL);
         curL.moved();
-      }
+          }
     }
 
   }
 
-  //findSounds
-  //---------------------------------------------------------------------------
-  //Goes through the converted letterList and builds the soundList
+  /* Goes through the converted letterList and builds the soundList*/
   public static void findSounds() {
-
     for (int i = 0; i < letterList.size(); i++) {
       char cur = letterList.get(i).getChar();
 
@@ -327,7 +337,7 @@ public class TengwarConvert {
 
       //Non-Character Symbols (. , ! ? ( ) )
       //--------------------------------------------------------------
-      
+
       else if ( cur == '.' ) soundList.add('-');
       else if ( cur == ',' ) soundList.add('=');
       else if ( cur == '!' ) soundList.add((char)193);
@@ -482,7 +492,7 @@ public class TengwarConvert {
 
       soundList.add(shortSingleLast1);
       soundList.add(shortSingleLast2);
-    }
+        }
     else 
       soundList.add(shortNormal);
   }
@@ -498,7 +508,7 @@ public class TengwarConvert {
 
       soundList.add(longSingleLast1);
       soundList.add(longSingleLast2);
-    }
+        }
     else {
       soundList.add(longNormal);
 
@@ -509,5 +519,4 @@ public class TengwarConvert {
         soundList.add(longNormalNotSingle);
     }    
   }
-
 }
