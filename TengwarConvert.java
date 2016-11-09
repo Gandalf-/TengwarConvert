@@ -108,7 +108,8 @@ public class TengwarConvert {
   public static void consoleInput () {
 
     Scanner console;
-    String input;
+    String[] wordsArray;
+    String input, outputString, newWord;
 
     System.out.println("Ready");   
     console = new Scanner(System.in);
@@ -117,10 +118,11 @@ public class TengwarConvert {
 
     //Move each word seperated by a space into an array of strings, wordsArray
     if (input.length() != 0) {
-      String[] wordsArray = input.split(" ");
-      String outputString = "";
+      wordsArray = input.split(" ");
+      outputString = "";
 
       for (String word : wordsArray) {      
+
         //Move each character in the input into an array and make them lowercase
         charArray = new char[word.length()];
         for (int i = 0; i < word.length(); i++) 
@@ -133,7 +135,7 @@ public class TengwarConvert {
 
         //Build the converted word, add it and a space to the outputString,
         // and reset the lists
-        String newWord = "";
+        newWord = "";
         for (int i = 0; i < soundList.size(); i++) 
           newWord += Character.toString( soundList.get(i) );
 
@@ -149,6 +151,22 @@ public class TengwarConvert {
     }
   }
 
+  /* helpers */
+  public static boolean contains(String base, char value) {
+    return base.contains("" + value);
+  }
+
+  public static boolean match(char a, String s) {
+    return a == s.charAt(0);
+  }
+
+  public static boolean match(char a, char b, String s) {
+    return (a == s.charAt(0)) && (b == s.charAt(1));
+  }
+
+  public static boolean match(char a, char b, char c, String s) {
+    return (a == s.charAt(0)) && (b == s.charAt(1)) && (c == s.charAt(2));
+  }
 
   /* Searches through the array of characters from input and converts them into
      simplified form: long vowels (ae, ee, ie, oe, ue) are capitalized and
@@ -170,23 +188,23 @@ public class TengwarConvert {
       nex = letterList.get(1).getChar();
 
       //of
-      if (cur == 'o' && nex == 'f') {
+      if (match(cur, nex, "of")) {
         letterList.clear(); 
         letterList.add(new Letter('J'));
       }   
     }
-    if (letterList.size() == 3) {
+    else if (letterList.size() == 3) {
       cur = letterList.get(0).getChar();
       nex = letterList.get(1).getChar();
       fol = letterList.get(2).getChar();
 
       //the
-      if (cur == 't' && nex == 'h' && fol == 'e') {
+      if (match(cur, nex, fol, "the")) {
         letterList.clear(); 
         letterList.add(new Letter('G'));
       } 
       //and
-      else if (cur == 'a' && nex == 'n' && fol == 'd') {
+      if (match(cur, nex, fol, "and")) {
         letterList.clear(); 
         letterList.add(new Letter('K'));
       }
@@ -199,58 +217,47 @@ public class TengwarConvert {
 
       //Repeated consonet case. These add short or long bars indicating a
       //repeated consonet sound
-      if (  cur == nex ) {
+      if (cur == nex) {
+
         //short width consonet, for single width consonents. Set second
         //repeated consonet Q
-        //if ("cfhkprstwl".contains("" + cur)) {
-        if (cur == 'c' || cur == 'f' || cur == 'h' ||
-            cur == 'k' || cur == 'p' || cur == 'r' || 
-            cur == 's' || cur == 't' || cur == 'w' || 
-            cur == 'l' ) {
-
+        if (contains("cfhkprstwl", cur))
           letterList.set(i+1, new Letter('Q'));
-            }
+
         //long width consonet, for double width consonets. Set second repeated
         //consonet R
-        if (cur == 'b' || cur == 'd' || cur == 'g' || 
-            cur == 'j' || cur == 'm' || cur == 'n' || 
-            cur == 'v' ) {
-
+        if (contains("bdgjmnv", cur))
           letterList.set(i+1, new Letter('R'));
-            }
       }
 
       //special double letter case  ( sh, ch, wh, ld), remove following letter 
       //and capitalize the first letter
-      if ((( cur == 's' || cur == 'c' || cur == 'w') && nex == 'h') || 
-          (cur == 'l' && nex == 'd') ||
-          (cur == 'n' && nex == 'g')) {
+      if ((contains("scw", cur) && match(nex, "h")) || match(cur, nex, "ld") ||
+          match(cur, nex, "ng")) {
 
-        letterList.set(i, new Letter(Character.toUpperCase(cur)) );
+        letterList.set(i, new Letter(Character.toUpperCase(cur)));
         letterList.remove(i+1);
-          }
+      }
 
       //th case. Change t to H, remove h
-      else if (  cur == 't' && nex == 'h') {
-        letterList.set(i, new Letter('H' ) );
+      else if (match(cur, nex, "th")) {
+        letterList.set(i, new Letter('H'));
         letterList.remove(i+1);
       }
 
       //n or m followed by t, d or b, p. Uppercase the following letter
-      else if (( cur == 'n'  && ( nex == 't' || nex == 'd')) || 
-          ( cur == 'm' &&  ( nex == 'b' || nex == 'p' ) ) ) {
-
-        letterList.set(i, new Letter(Character.toUpperCase(nex)) );
+      else if (match(cur, nex, "nt") || match(cur, nex, "nd") || match(cur,
+              nex, "mb") || match(cur, nex, "bp")) {
+        letterList.set(i, new Letter(Character.toUpperCase(nex)));
         letterList.remove(i+1);  
-          }   
+      }   
 
-      //long vowel case. Any vowel followed by an e. Uppercase vowel, remove following e
-      else if ( (cur == 'a' || cur == 'e' || cur == 'i' || cur == 'o' || cur == 'u')
-          && nex == 'e') {
-
-        letterList.set(i, new Letter(Character.toUpperCase(cur)) );
+      //long vowel case. Any vowel followed by an e. Uppercase vowel, remove
+      //following e
+      else if (contains("aeiou", cur) && nex == 'e') {
+        letterList.set(i, new Letter(Character.toUpperCase(cur)));
         letterList.remove(i+1);
-          }
+      }
     }
 
     //s followed by a vowel case, change to downward pointing S
@@ -258,11 +265,8 @@ public class TengwarConvert {
       cur = letterList.get(i).getChar();
       nex = letterList.get(i+1).getChar();
 
-      if ( cur == 's' && (nex == 'a' || nex == 'e' || 
-            nex == 'i' || nex == 'o' || nex == 'u') ) {
-
+      if (cur == 's' && contains("aeiou", nex))
         letterList.set(i, new Letter((char)27) );
-            }  
     }
   }
 
@@ -296,21 +300,20 @@ public class TengwarConvert {
       Letter nexL = letterList.get(i+1);
 
       //Move short vowel case. Swap nexL and curL in letterList
-      if ( (cur == 'a' || cur == 'e' || cur == 'i' || cur == 'o' || cur == 'u') 
-          && (curL.getState() == false) ) {
+      if (contains("aeiou", cur) && (! curL.getState() )) {
 
         letterList.set(i, nexL);
         letterList.set(i+1, curL);
         curL.moved();
-          }
+      }
+
       ///Move long vowel case. Swap nexL and curL in letterList
-      if ( (cur == 'A' || cur == 'E' || cur == 'I' || cur == 'O' || cur == 'U') 
-          && (curL.getState() == false) ) {
+      if (contains("AEIOU", cur) && (! curL.getState() )) {
 
         letterList.set(i, nexL);
         letterList.set(i+1, curL);
         curL.moved();
-          }
+      }
     }
 
   }
@@ -344,7 +347,7 @@ public class TengwarConvert {
       else if ( cur == '?' ) soundList.add((char)192);
       else if ( cur == '(' ) soundList.add((char)140);
       else if ( cur == ')' ) soundList.add((char)156);
-      else if ( cur == '-') soundList.add((char)194);
+      else if ( cur == '-' ) soundList.add((char)194);
 
       //Repeated Letter Modifiers
       //short width bar
@@ -361,13 +364,13 @@ public class TengwarConvert {
       //sh
       else if ( cur == 'S' ) soundList.add((char)100);
       //ch
-      else if ( cur == 'C') soundList.add((char)65);
+      else if ( cur == 'C' ) soundList.add((char)65);
       //wh
-      else  if ( cur == 'W') soundList.add((char)111);
+      else if ( cur == 'W' ) soundList.add((char)111);
       //ld
-      else if ( cur == 'L') soundList.add((char)109);
+      else if ( cur == 'L' ) soundList.add((char)109);
       //ng
-      else if ( cur == 'N') soundList.add((char)98 );
+      else if ( cur == 'N' ) soundList.add((char)98 );
       //nt
       else if ( cur == 'T' ) {
         soundList.add((char)49);
@@ -384,12 +387,12 @@ public class TengwarConvert {
         soundList.add('p');
       }
       //mb
-      else if (cur == 'B' ) {
+      else if ( cur == 'B' ) {
         soundList.add((char)119);
         soundList.add('P');
       }
       //last s 
-      else if (cur == 'X') soundList.add('_');
+      else if ( cur == 'X' ) soundList.add('_');
 
 
       //Consonents
@@ -487,12 +490,12 @@ public class TengwarConvert {
       char shortSingleLast1, char shortSingleLast2, char shortNormal){
 
     //Single or last character, but not because it was moved there       
-    if ( (letterList.size() == 1) || (letterList.peekLast().getChar() == cur) 
-        && (letterList.peekLast().getState() == false) ) {
+    if ((letterList.size() == 1) || (letterList.peekLast().getChar() == cur) &&
+        (! letterList.peekLast().getState())) {
 
       soundList.add(shortSingleLast1);
       soundList.add(shortSingleLast2);
-        }
+    }
     else 
       soundList.add(shortNormal);
   }
