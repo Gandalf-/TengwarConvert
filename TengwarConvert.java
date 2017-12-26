@@ -1,15 +1,15 @@
 /*
-  Converts Roman letters to Tengwar in English mode. Result is returned 
+  Converts Roman letters to Tengwar in English mode. Result is returned
   in the format used by the Tengwar Annatar font
 
   Two input methods:
-  1) Input file from command line arguements: the file is read in, 
+  1) Input file from command line arguements: the file is read in,
      converted and then printed out to a new file
   2) Input is from console
 
-  Testing: 
-  in aenchent tiems the rings of power wer crafted bie the elven-smiths, 
-  and sawron, the dark lord, forjed the wun ring, filling it with hiz 
+  Testing:
+  in aenchent tiems the rings of power wer crafted bie the elven-smiths,
+  and sawron, the dark lord, forjed the wun ring, filling it with hiz
   oewn power so that he culd rul all others!
 */
 
@@ -20,23 +20,23 @@ import java.util.*;
 
 public class TengwarConvert {
   public static LinkedList<Character> soundList;
-  public static LinkedList<Letter> letterList;
-  public static char[] charArray;
+  public static LinkedList<Letter>    letterList;
+  public static char[]                charArray;
 
-  public static void main (String[] args) { 
+  public static void main (String[] args) {
     /* Determine which method of input is being given and call the
      * corresponding method
      */
 
-    soundList = new LinkedList<Character>();
+    soundList  = new LinkedList<Character>();
     letterList = new LinkedList<Letter>();
 
     try {
       if (args.length == 1)
-        fileInput(args); 
-      else 
-        consoleInput(); 
-    } 
+        fileInput(args);
+      else
+        consoleInput();
+    }
     catch (FileNotFoundException e) {
       System.out.println("error: file not found");
     }
@@ -73,19 +73,21 @@ public class TengwarConvert {
         for (String word : wordsArray) {
           wordLen = word.length();
 
-          if (wordLen != 0) {      
+          if (wordLen != 0) {
 
             /* string -> lowercase char[] */
-            for (i = 0, charArray = new char[wordLen]; i < wordLen; i++) 
+            for (i = 0, charArray = new char[wordLen]; i < wordLen; i++) {
               charArray[i] = Character.toLowerCase(word.charAt(i));
+            }
 
             simplify();       /* char[]     -> letterList */
             sortVowels();     /* letterList -> letterList */
             findSounds();     /* letterList -> soundList  */
 
             // retrieve output from soundList
-            for (i = 0, newWord = ""; i < soundList.size(); i++) 
+            for (i = 0, newWord = ""; i < soundList.size(); i++) {
               newWord += Character.toString(soundList.get(i));
+            }
 
             outputLine += newWord + " ";
             letterList.clear();
@@ -106,7 +108,7 @@ public class TengwarConvert {
     String[] wordsArray;
     String currentLine, outputLine, newWord;
 
-    System.out.println("Ready");   
+    System.out.println("Ready");
     console = new Scanner(System.in);
     currentLine = console.nextLine();
     System.out.println("Converting...");
@@ -117,13 +119,13 @@ public class TengwarConvert {
       wordsArray = currentLine.split(" ");
       outputLine = "";
 
-      for (String word : wordsArray) {      
+      for (String word : wordsArray) {
         wordLen = word.length();
 
-        if (wordLen != 0) {      
+        if (wordLen != 0) {
 
           /* string -> lowercase char[] */
-          for (i = 0, charArray = new char[wordLen]; i < wordLen; i++) 
+          for (i = 0, charArray = new char[wordLen]; i < wordLen; i++)
             charArray[i] = Character.toLowerCase(word.charAt(i));
 
           simplify();       /* char[]     -> letterList */
@@ -131,7 +133,7 @@ public class TengwarConvert {
           findSounds();     /* letterList -> soundList  */
 
           // retrieve output from soundList
-          for (i = 0, newWord = ""; i < soundList.size(); i++) 
+          for (i = 0, newWord = ""; i < soundList.size(); i++)
             newWord += Character.toString(soundList.get(i));
 
           outputLine += newWord + " ";
@@ -167,9 +169,9 @@ public class TengwarConvert {
 
       //of
       if (match(cur, nex, "of")) {
-        letterList.clear(); 
+        letterList.clear();
         letterList.add(new Letter('J'));
-      }   
+      }
     }
     else if (letterList.size() == 3) {
       cur = letterList.get(0).getChar();
@@ -178,17 +180,17 @@ public class TengwarConvert {
 
       //the
       if (match(cur, nex, fol, "the")) {
-        letterList.clear(); 
+        letterList.clear();
         letterList.add(new Letter('G'));
-      } 
+      }
       //and
       if (match(cur, nex, fol, "and")) {
-        letterList.clear(); 
+        letterList.clear();
         letterList.add(new Letter('K'));
       }
     }
 
-    //Make changes      
+    //Make changes
     for (i = 0; i < lastIndex; i++) {
       cur = letterList.get(i).getChar();
       nex = letterList.get(i+1).getChar();
@@ -208,14 +210,14 @@ public class TengwarConvert {
           letterList.set(i+1, new Letter('R'));
       }
 
-      //special double letter case  ( sh, ch, wh, ld), remove following letter 
+      //special double letter case  ( sh, ch, wh, ld), remove following letter
       //and capitalize the first letter
       if ((contains("scw", cur) && match(nex, "h")) || match(cur, nex, "ld") ||
           match(cur, nex, "ng")) {
 
         letterList.set(i, new Letter(Character.toUpperCase(cur)));
         letterList.remove(i+1);
-          }
+      }
 
       //th case. Change t to H, remove h
       else if (match(cur, nex, "th")) {
@@ -227,8 +229,8 @@ public class TengwarConvert {
       else if (match(cur, nex, "nt") || match(cur, nex, "nd") || match(cur,
             nex, "mb") || match(cur, nex, "bp")) {
         letterList.set(i, new Letter(Character.toUpperCase(nex)));
-        letterList.remove(i+1);  
-      }   
+        letterList.remove(i+1);
+      }
 
       //long vowel case. Any vowel followed by an e. Uppercase vowel, remove
       //following e
@@ -249,7 +251,7 @@ public class TengwarConvert {
   }
 
 
-  /* Searches through the array of characters and moves vowels 
+  /* Searches through the array of characters and moves vowels
      one character to the right*/
   public static void sortVowels() {
 
@@ -266,11 +268,11 @@ public class TengwarConvert {
 
       //Compare secondToLast against all vowels
       foundVowel = false;
-      for (char vowel : vowels) 
-        if (secondToLast == vowel) 
+      for (char vowel : vowels)
+        if (secondToLast == vowel)
           foundVowel = true;
 
-      if (foundVowel == false ) 
+      if (foundVowel == false )
         letterList.set(lastIndex, new Letter('X') );
     }
 
@@ -294,6 +296,172 @@ public class TengwarConvert {
         letterList.set(i+1, curL);
         curL.moved();
       }
+    }
+  }
+
+  /* Goes through the converted letterList and builds the soundList*/
+  public static void findSoundsRefactor() {
+    for (int i = 0; i < letterList.size(); i++) {
+      char cur = letterList.get(i).getChar();
+
+      switch (cur) {
+        // special words (the, and, of)
+        case 'G':               // the
+          soundList.add('@');
+          break;
+
+        case 'J':               // of
+          soundList.add('@');
+          soundList.add(':');
+          break;
+
+        case 'K':               //and
+          soundList.add('@');
+          soundList.add('P');
+          break;
+
+        // symbols (. , ! ? ( ) )
+        case '.': soundList.add('-'); break;
+        case ',': soundList.add('='); break;
+        case '!': soundList.add((char)193); break;
+        case '?': soundList.add((char)192); break;
+        case '(': soundList.add((char)140); break;
+        case ')': soundList.add((char)156); break;
+        case '-': soundList.add((char)194); break;
+
+      }
+
+      //Repeated Letter Modifiers
+      //short width bar
+      if ( cur == 'R' ) soundList.add(':');
+      //long width bar
+      else if ( cur == 'Q' ) soundList.add(';');
+
+
+      //Multi letters (th, sh, ch, wh, ld, ng, nt, nd, mp, mb, and following s)
+      //--------------------------------------------------------------
+
+      //th
+      else if ( cur == 'H' ) soundList.add((char)51);
+      //sh
+      else if ( cur == 'S' ) soundList.add((char)100);
+      //ch
+      else if ( cur == 'C' ) soundList.add((char)65);
+      //wh
+      else if ( cur == 'W' ) soundList.add((char)111);
+      //ld
+      else if ( cur == 'L' ) soundList.add((char)109);
+      //ng
+      else if ( cur == 'N' ) soundList.add((char)98 );
+      //nt
+      else if ( cur == 'T' ) {
+        soundList.add((char)49);
+        soundList.add('p');
+      }
+      //nd
+      else if ( cur == 'D' ) {
+        soundList.add((char)50);
+        soundList.add('P');
+      }
+      //mp
+      else if ( cur == 'P' ) {
+        soundList.add((char)113);
+        soundList.add('p');
+      }
+      //mb
+      else if ( cur == 'B' ) {
+        soundList.add((char)119);
+        soundList.add('P');
+      }
+      //last s
+      else if ( cur == 'X' ) soundList.add('_');
+
+      //Consonents
+      //--------------------------------------------------------------
+      else if (cur == 'b') soundList.add((char)119);
+      else if (cur == 'c') soundList.add((char)122);
+      else if (cur == 'd') soundList.add((char)50);
+      else if (cur == 'f') soundList.add((char)101);
+      else if (cur == 'g') soundList.add((char)120);
+      else if (cur == 'h') soundList.add((char)57);
+      else if (cur == 'j') soundList.add((char)115);
+      else if (cur == 'k') soundList.add((char)122);
+      else if (cur == 'l') soundList.add((char)106);
+      else if (cur == 'm') soundList.add((char)116);
+      else if (cur == 'n') soundList.add((char)53);
+      else if (cur == 'p') soundList.add((char)113);
+      else if ( cur == 'q') {
+        soundList.add((char)122);
+        soundList.add(i+1, (char)121);
+      }
+      else if ( cur == 'r') soundList.add((char)54);
+      else if ( cur == 't') soundList.add((char)49);
+
+      //S pointed up, or pointed down
+      else if ( cur == 's') soundList.add((char)105);
+      else if ( cur == (char)27) soundList.add((char)56);
+
+      else if ( cur == 'v') soundList.add((char)114);
+      else if ( cur == 'w') soundList.add((char)121);
+      else if ( cur == 'x') {
+        soundList.add((char)122);
+        soundList.add((char)96);
+      }
+      else if ( cur == 'y') soundList.add((char)104);
+      else if ( cur == 'z') soundList.add((char)44);
+
+      //Vowels
+      //--------------------------------------------------------------
+
+      //A
+      //Short
+      else if ( cur == 'a')
+        convertShortVowel(cur, i, letterList, soundList,
+            (char)96, 'D', (char)35);
+      //Long
+      else if (cur == 'A')
+        convertLongVowel(cur, i, letterList, soundList,
+            (char)126, 'D', (char)35, (char)76, (char)40);
+
+      //E
+      //Short
+      else if ( cur == 'e')
+        convertShortVowel(cur, i, letterList, soundList,
+            (char)96, 'F', (char)36);
+      //Long
+      else if (cur == 'E')
+        convertLongVowel(cur, i, letterList, soundList,
+            (char)126, 'F', (char)36, (char)76, (char)40);
+
+      //I
+      //Short
+      else if ( cur == 'i')
+        convertShortVowel(cur, i, letterList, soundList,
+            (char)96, 'G', (char)37);
+      //Long
+      else if (cur == 'I')
+        convertLongVowel(cur, i, letterList, soundList,
+            (char)126, 'G', (char)37, (char)76, (char)40);
+
+      //O
+      //Short
+      else if ( cur == 'o')
+        convertShortVowel(cur, i, letterList, soundList,
+            (char)96, 'H', (char)94);
+      //Long
+      else if (cur == 'O')
+        convertLongVowel(cur, i, letterList, soundList,
+            (char)126, 'H', (char)94, (char)76, (char)40);
+
+      //U
+      //Short
+      else if ( cur == 'u')
+        convertShortVowel(cur, i, letterList, soundList,
+            (char)96, 'J', (char)38);
+      //Long
+      else if (cur == 'U')
+        convertLongVowel(cur, i, letterList, soundList,
+            (char)126, 'J', (char)38, (char)76, (char)40);
     }
   }
 
@@ -370,7 +538,7 @@ public class TengwarConvert {
         soundList.add((char)119);
         soundList.add('P');
       }
-      //last s 
+      //last s
       else if ( cur == 'X' ) soundList.add('_');
 
       //Consonents
@@ -412,7 +580,7 @@ public class TengwarConvert {
 
       //A
       //Short
-      else if ( cur == 'a') 
+      else if ( cur == 'a')
         convertShortVowel(cur, i, letterList, soundList,
             (char)96, 'D', (char)35);
       //Long
@@ -422,7 +590,7 @@ public class TengwarConvert {
 
       //E
       //Short
-      else if ( cur == 'e') 
+      else if ( cur == 'e')
         convertShortVowel(cur, i, letterList, soundList,
             (char)96, 'F', (char)36);
       //Long
@@ -432,7 +600,7 @@ public class TengwarConvert {
 
       //I
       //Short
-      else if ( cur == 'i') 
+      else if ( cur == 'i')
         convertShortVowel(cur, i, letterList, soundList,
             (char)96, 'G', (char)37);
       //Long
@@ -442,7 +610,7 @@ public class TengwarConvert {
 
       //O
       //Short
-      else if ( cur == 'o') 
+      else if ( cur == 'o')
         convertShortVowel(cur, i, letterList, soundList,
             (char)96, 'H', (char)94);
       //Long
@@ -452,11 +620,11 @@ public class TengwarConvert {
 
       //U
       //Short
-      else if ( cur == 'u') 
-        convertShortVowel(cur, i, letterList, soundList, 
+      else if ( cur == 'u')
+        convertShortVowel(cur, i, letterList, soundList,
             (char)96, 'J', (char)38);
       //Long
-      else if (cur == 'U') 
+      else if (cur == 'U')
         convertLongVowel(cur, i, letterList, soundList,
             (char)126, 'J', (char)38, (char)76, (char)40);
     }
@@ -466,23 +634,23 @@ public class TengwarConvert {
       LinkedList<Letter> letterList, LinkedList<Character> soundList,
       char shortSingleLast1, char shortSingleLast2, char shortNormal){
 
-    //Single or last character, but not because it was moved there       
+    //Single or last character, but not because it was moved there
     if ((letterList.size() == 1) || (letterList.peekLast().getChar() == cur) &&
         (! letterList.peekLast().getState())) {
 
       soundList.add(shortSingleLast1);
       soundList.add(shortSingleLast2);
         }
-    else 
+    else
       soundList.add(shortNormal);
   }
 
   private static void convertLongVowel( char cur, int i,
-      LinkedList<Letter> letterList, LinkedList<Character> soundList, 
+      LinkedList<Letter> letterList, LinkedList<Character> soundList,
       char longSingleLast1, char longSingleLast2, char longNormal,
       char longNormalSingle, char longNormalNotSingle){
 
-    //Single or last character, but not because it was moved there       
+    //Single or last character, but not because it was moved there
     if ( (letterList.size() == 1) || (letterList.peekLast().getChar() == cur)
         && (letterList.peekLast().getState() == false) ) {
 
@@ -493,11 +661,11 @@ public class TengwarConvert {
       soundList.add(longNormal);
 
       // Stand alone vowel
-      if (soundList.size() > 1 && (soundList.get(i-1) == 'j') ) 
+      if (soundList.size() > 1 && (soundList.get(i-1) == 'j') )
         soundList.add(longNormalSingle);
-      else 
+      else
         soundList.add(longNormalNotSingle);
-    }    
+    }
   }
 
   /* helpers */
